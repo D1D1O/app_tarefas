@@ -1,59 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_001/components/difficulty.dart';
+import 'package:projeto_001/data/task_inherited.dart';
 
 class Task extends StatefulWidget {
   final String nome;
   final String foto;
   final int dificuldade;
 
-  const Task(
+  Task(
       {required this.dificuldade,
       required this.nome,
       this.foto = '',
       super.key});
+
+  int nivel = 0;
+  int nivelReal = 0;
+  int nivelDf = 0;
+  var color = Colors.blue;
 
   @override
   State<Task> createState() => _TaskState();
 }
 
 class _TaskState extends State<Task> {
-  int nivel = 0;
-  int nivelReal = 0;
-  int nivelDf = 0;
-  var color = Colors.blue;
-  void calculaNivel(){
-    try{
-      nivelReal++;
-      print(nivelReal);
+  void calculaNivel() {
+    try {
+      widget.nivelReal++;
+      //print(widget.nivelReal);
 
-      if (widget.dificuldade == 0){
-        nivelDf = 1;
-      }else{
-        nivelDf = widget.dificuldade;
+      if (widget.dificuldade == 0) {
+        widget.nivelDf = 1;
+      } else {
+        widget.nivelDf = widget.dificuldade;
       }
-      if(nivelReal > 10 * nivelDf && nivelReal <= 20 * nivelDf){
-        color = Colors.green;
-      }else if (nivelReal > 20 * nivelDf && nivelReal <= 30 * nivelDf){
-        color = Colors.amber;
-      }else if (nivelReal > 30 * nivelDf && nivelReal <= 40 * nivelDf){
-        color = Colors.purple;
-      }else if (nivelReal > 40 * nivelDf && nivelReal <= 50 * nivelDf){
-        color = Colors.red;
+      if (widget.nivelReal > 10 * widget.nivelDf &&
+          widget.nivelReal <= 20 * widget.nivelDf) {
+        widget.color = Colors.green;
+      } else if (widget.nivelReal > 20 * widget.nivelDf &&
+          widget.nivelReal <= 30 * widget.nivelDf) {
+        widget.color = Colors.amber;
+      } else if (widget.nivelReal > 30 * widget.nivelDf &&
+          widget.nivelReal <= 40 * widget.nivelDf) {
+        widget.color = Colors.purple;
+      } else if (widget.nivelReal > 40 * widget.nivelDf &&
+          widget.nivelReal <= 50 * widget.nivelDf) {
+        widget.color = Colors.red;
       }
 
-      if ((nivel/nivelDf)/10 == 1  ){
-        nivel = 0;
+      if ((widget.nivel / widget.nivelDf) / 10 == 1) {
+        widget.nivel = 0;
       }
       setState(
-            () {
-          nivel++;
+        () {
+          widget.nivel++;
         },
       );
-
-    }
-    on Exception catch  (exception){
+    } on Exception catch (exception) {
       print('Error');
     }
+  }
+
+  bool assetOrNetwork() {
+    if (widget.foto.contains('http')) {
+      return false;
+    }
+    return true;
   }
 
   @override
@@ -70,7 +81,7 @@ class _TaskState extends State<Task> {
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(4),
-                color: color,
+                color: widget.color,
               ),
               height: 140,
             ),
@@ -92,10 +103,15 @@ class _TaskState extends State<Task> {
                         height: 100,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(4),
-                          child: Image.asset(
-                            widget.foto,
-                            fit: BoxFit.cover,
-                          ),
+                          child: assetOrNetwork()
+                              ? Image.asset(
+                                  widget.foto,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.network(
+                                  widget.foto,
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                       ),
                       Column(
@@ -117,7 +133,8 @@ class _TaskState extends State<Task> {
                       ElevatedButton(
                         onPressed: () {
                           calculaNivel();
-                          //print(nivel);
+                          TaskInherited.of(context)
+                              .addGlobalLEvel(widget.dificuldade);
                         },
                         child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -145,7 +162,7 @@ class _TaskState extends State<Task> {
                           width: 200,
                           child: LinearProgressIndicator(
                             value: (widget.dificuldade >= 1)
-                                ? (nivel / widget.dificuldade) / 10
+                                ? (widget.nivel / widget.dificuldade) / 10
                                 : 1,
                             color: Colors.white,
                           )),
@@ -153,7 +170,7 @@ class _TaskState extends State<Task> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        'Nível: $nivel',
+                        'Nível: ${widget.nivel}',
                         style:
                             const TextStyle(fontSize: 16, color: Colors.white),
                       ),
