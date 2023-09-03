@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_001/components/difficulty.dart';
+import 'package:projeto_001/data/task_dao.dart';
 import 'package:projeto_001/data/task_inherited.dart';
 
 class Task extends StatefulWidget {
@@ -131,6 +132,9 @@ class _TaskState extends State<Task> {
                         ],
                       ),
                       ElevatedButton(
+                        onLongPress: (){
+                          TaskDao().delete(widget.nome);
+                        },
                         onPressed: () {
                           calculaNivel();
                           TaskInherited.of(context)

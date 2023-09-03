@@ -13,7 +13,39 @@ class TaskDao {
   static const String _difficulty = 'difficulty';
   static const String _image = 'image';
 
-  save(Task tarefa) async {}
+  save(Task tarefa) async {
+    print('Acessando save:');
+    final Database bancoDeDados = await getDatabase();
+    Map<String, dynamic> taskMap = toMap(tarefa);
+
+    var itemExiste = await find(tarefa.nome);
+
+    if (itemExiste.isEmpty) {
+      print('Item não existe, SALVAR!');
+      return await bancoDeDados.insert(_tablename, taskMap);
+    } else {
+      print('Item existe, ATUALIZAR!');
+      return await bancoDeDados.update(
+        _tablename,
+        taskMap,
+        where: '$_name = ?',
+        whereArgs: [tarefa.nome],
+      );
+    }
+  }
+
+  Map<String, dynamic> toMap(Task tarefa) {
+    print('Acessando toMap:');
+
+    final Map<String, dynamic> mapaDetarefas = Map();
+    mapaDetarefas[_name] = tarefa.nome;
+    mapaDetarefas[_difficulty] = tarefa.dificuldade;
+    mapaDetarefas[_image] = tarefa.foto;
+
+    print('Mapa de Tarefas: $mapaDetarefas ');
+
+    return mapaDetarefas;
+  }
 
   Future<List<Task>> findAll() async {
     print('Acessando o findAll');
@@ -45,16 +77,27 @@ class TaskDao {
     print('Acessando find:');
 
     final Database bancoDeDados = await getDatabase();
-    final List<Map<String, dynamic>> result = await bancoDeDados.query(
-      _tablename,
-      //columns: [_name, _image, _difficulty],
-      where: '$_name = ?',
-      whereArgs: [nomeDaTarefa]
-    );
+    final List<Map<String, dynamic>> result =
+        await bancoDeDados.query(_tablename,
+            //columns: [_name, _image, _difficulty],
+            where: '$_name = ?',
+            whereArgs: [nomeDaTarefa]);
     print('Tarefa encontrada $result');
 
     return toList(result);
   }
 
-  delete(String nomeDaTarefa) async {}
+  delete(String nomeDaTarefa) async {
+    print('Deletando tarefa $nomeDaTarefa');
+
+    final Database bancoDeDados = await getDatabase();
+
+    int result = await bancoDeDados.delete(
+      _tablename,
+      where: '$_name = ?',
+      whereArgs: [nomeDaTarefa],
+    );
+    //print(result);
+    return result;
+  }
 }
