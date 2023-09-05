@@ -2,6 +2,8 @@
 
 A new Flutter project.
 
+![001](https://github.com/D1D1O/app_tarefas/assets/31021190/280079a7-adc8-469b-99a9-a58382b2716f)
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
